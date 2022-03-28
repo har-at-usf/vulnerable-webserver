@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <!-- Pull a set of pretty fonts. -->
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+        <!-- Pull the crypto libraries needed for cryptographic functions. -->
+        <script type="text/javascript" src="https://bitwiseshiftleft.github.io/sjcl/sjcl.js"></script>
+
+        <style>
+            p, h1, h2, h3, td, th, li, aside, form{
+                font-family: "Open Sans", "Verdana", Sans-serif;
+            }
+            
+            form{
+                padding: 5%;
+                border: 1px solid lightgrey;
+                background-color: white;
+            }
+            
+            h1, h2 {
+                font-weight: normal;
+                color: #385D5D;
+            
+            }
+            
+            body {
+                max-width: 800px;
+                width: 95%;
+                margin: 100 auto;
+                background-color: #fbfbfb;
+                border: 1px solid lightgrey;  
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <script>
+
+            /**
+             * Generate a SHA 256 representation of the hash.
+             * 
+             * https://bitwiseshiftleft.github.io/sjcl/
+             */
+            function sha256(text){
+                const myBitArray = sjcl.hash.sha256.hash(text)
+                const myHash = sjcl.codec.hex.fromBits(myBitArray)
+                return myHash
+            }
+
+            /**
+             * Compare the user's password with the one on file. Accepts the
+             * cleartext password, and returns a boolean if it matches the
+             * administrator's password, which is hardcoded in the webpage.
+             */
+            function isSysAdmin(){
+                const sysAdminHash = "0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e"
+                const passwordHash = sha256(
+                    document.getElementById("password").value
+                )
+                return passwordHash == sysAdminHash
+            }
+
+            isSysAdmin()
+            
+            /**
+             * Handle the form's behavior. Open dashboard if login validates
+             * based on the client-side login. Otherwise, stay at the login
+             * screen.
+             * 
+             * Associate with the login form (ID).
+             * 
+             * https://www.tutorialspoint.com/How-to-stop-form-submission-using-JavaScript
+             */
+            function validateLogin(){
+                
+                const loginForm = document.getElementById("login-form")
+
+                if (!isSysAdmin()) {
+                    alert("Login failed!")
+                    console.log("Login failed.")
+                    return false
+                }
+                console.log("Successful login.")
+                loginForm.submit()
+                return true
+            }
+                
+        </script>
+
+        <h1>Administrative Panel Login</h1>
+
+        <!-- 
+            Remove the  `onsubmit` definition if you don't need to prove an
+            issue that's related to hardcoded password hashing.
+        -->
+        <form 
+            onsubmit="event.preventDefault(); return validateLogin();" 
+            id="login-form"
+            action="/login" 
+            method="POST"
+        >
+         
+            <input type="hidden" class="form-control" id="csrf-token" name="csrf-token">
+         
+            <label for="email">Username or Email</label>
+            <input type='text' name='email'/>
+
+            <label for="password">Password</label>
+            <input type='password' id="password" name='password'/>
+
+            <p><input type='submit' value='Log in'/></p>
+      
+      </form>
+      
+   </body>
+</html>

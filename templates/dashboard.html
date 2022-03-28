@@ -1,0 +1,66 @@
+<html>
+<head>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+<style>
+p, h1, h2, h3, td, th, li, aside, form, div { 
+    font-family: "Open Sans", Sans-serif;
+}
+
+form{
+    padding: 5%;
+    border: 1px solid lightgrey;
+    background-color: white;
+}
+
+h1, h2 {
+    font-weight: normal;
+    color: #385D5D;
+
+}
+
+body {
+    max-width: 800px;
+    width: 95%;
+    margin: 100 auto;
+    background-color: #fbfbfb;
+    border: 1px solid lightgrey;  
+    padding: 10px;
+}
+</style>
+
+</head>
+<body>
+<script>
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+</script>
+
+<h1>User Actions</h1>
+
+<p><h2>Update email address</h2></p>
+
+<form action = "/update-email" method = "POST">
+    <input type="hidden" class="form-control" id="csrf-token" name="csrf-token">
+    <p><input type = "text" name = "new_email"/></p>
+    <p><input type = "submit" value = "Update"/></p>
+</form>
+
+<script>
+    document.getElementById("csrf-token").value = getCookie("csrf-token");
+</script>
+</body>
+</html>
