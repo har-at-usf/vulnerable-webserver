@@ -1,6 +1,7 @@
 from tokens import TokenizedSessionManager
 from flask import Flask, render_template, request, make_response
 from traceback import print_exc
+from os import path, rmdir 
 
 
 SESSION_MANAGER = TokenizedSessionManager()
@@ -79,4 +80,13 @@ def change_email():
 
 
 if __name__ == "__main__":
+    """TODO: Separate this logic somewhere else..."""
+
+    delete_these = ["__pycache__"]
+    
+    for filename in delete_these:
+    
+        if path.exists(filename):
+            rmdir(filename)
+
     app.run()

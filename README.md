@@ -8,6 +8,11 @@ The flask applications are designed as a base. This should allow you to write yo
 
 # Starting the application
 
+Install the following applications or packages:
+
+- `python3 >= 3.7`  
+- `bcrypt`
+
 To start the application, run the `start-webserver.sh` script.
 
 # Exploits
