@@ -1,7 +1,8 @@
 from tokens import TokenizedSessionManager
 from flask import Flask, render_template, request, make_response
 from traceback import print_exc
-from os import path, rmdir 
+from os import path
+from shutil import rmtree
 
 
 SESSION_MANAGER = TokenizedSessionManager()
@@ -87,6 +88,6 @@ if __name__ == "__main__":
     for filename in delete_these:
     
         if path.exists(filename):
-            rmdir(filename)
+            rmtree(filename)
 
     app.run()
