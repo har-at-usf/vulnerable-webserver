@@ -1,17 +1,10 @@
-# CSRF Demo
+# Vulnerable Webserver
 
-# Purpose 
+This is a simple Flask application that is meant for education or research purposes. The intent is to provide a developer with the means to create their own exploit, for demonstration purposes. 
 
-This project allows you to demonstrate a CSRF exploit. There are
-two components:
+The idea of a "vulnerable web application" is not new. This project differs from existing ones because you are not supposed to "find" any exploits or flaws. Instead, you are supposed to *make* them.
 
--   Vulnerable web application. The default initializes a poorly
-    implemented session manager, one that does not use CSRF 
-    tokens. The `session` module also includes a better version,
-    which does use tokens to authorize requests. 
-
--   CSRF webpage. This will immediately launch the exploit and
-    redirect to the webpage. 
+The flask applications are designed as a base. This should allow you to write your own exploits, to your liking, without wasting time finding them. It is less of a "pentest box" and more of an application template.
 
 # Exploit workflow
 
