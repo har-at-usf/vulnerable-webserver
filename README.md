@@ -6,7 +6,13 @@ The idea of a "vulnerable web application" is not new. This project differs from
 
 The flask applications are designed as a base. This should allow you to write your own exploits, to your liking, without wasting time finding them. It is less of a "pentest box" and more of an application template.
 
-# Exploit workflow
+# Starting the application
+
+To start the application, run the `start-webserver.sh` script.
+
+# Exploits
+
+This is an overview of the *very deliberate vulnerabilities* that currently exist.
 
 ## CSRF
 
