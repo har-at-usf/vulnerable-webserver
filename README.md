@@ -28,7 +28,9 @@ This is an overview of the *very deliberate vulnerabilities* that currently exis
 
 The mitigated file (somewhat misleadingly) contains a weak, hardcoded administrator password hash. An attacker can create a rainbow table of (hashing weak-password permutations) to reveal a valid password. 
 
-For documentation reasons, the password is `password1`. If you are trying this yourself, you should try to leverage an application or service that generates permutations. The input for the application or service should be weak, common passwords: for example, what you might expect for routers or webserver admin panels.
+For documentation reasons, the password is `password1`. 
+
+If you are trying this for the sake of "breaking it on your own," you could first try to leverage an application or service that generates permutations. The input for the application or service should be weak, common passwords: for example, what you might expect for routers or webserver admin panels. In addition, precomputed hash tables would also be a great demo for your audience.
 
 # Mitigation 
 
