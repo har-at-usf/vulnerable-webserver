@@ -13,7 +13,7 @@ Install the following applications or packages:
 - `python3 >= 3.7`  
 - `bcrypt`
 
-To start the application, run the `start-webserver.sh` script.
+To start the application, run the `app.py` script.
 
 # Exploits
 
