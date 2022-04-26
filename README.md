@@ -13,20 +13,24 @@ Install the following applications or packages:
 - `python3 >= 3.7`  
 - `bcrypt`
 
-To start the application, run the `app.py` script.
+To start the application, run the `app.py` script. Use the command-line options to specify vulnerabilities. Use `app.py -h` to list all options.
+
+**NOTE**: You must use the same domain for all attacks. For a local session, use `127.0.0.1` or `localhost`, but *not both interchangably*. For example, the CSRF attack will fail if you use `localhost`.
 
 # Exploits
 
-This is an overview of the *very deliberate vulnerabilities* that currently exist.
+This is an overview of the *very deliberate vulnerabilities* that currently exist. The idea is for you (the developer) to add exploits. This is meant for educational purposes, so keep them simple but meaningful.
 
 ## CSRF
 
+By default, the application uses a basic "synchronizer" token to prevent CSRFs. You can disable these using the `--csrf` command-line option. To exploit it while using this option, do the following:
+
 1.  Launch the Flask application.
-1.  Open a web browser to `localhost:5000`
+1.  Open a web browser to `127.0.0.1:5000`
 1.  Log in with the credentials `admin@mail.tld`.
 1.  Navigate to the dashboard.
 1.  Try to update the email address (authorized request).
-1.  Open the malicious `csrf.html` page in the browser.
+1.  Open the malicious `csrf.html` page in the same browser.
 1.  Check that the malicious request has changed the email address.
 
 You can mitigate this attack by using tokens. This is what the "regular" `app.py` does by default, albeit with basic tokens. JWTs may improve the integrity of tokens even further; the user can recommend these, but the demo will not implement them, as it is outside of scope. (The point is to show what happens when you don't use *any* tokenas at all. It is a very simple point.)

@@ -59,13 +59,13 @@ body {
 <p><h2>Update email address</h2></p>
 
 <form action = "/update-email" method = "POST">
-    <input type="hidden" class="form-control" id="csrf-token" name="csrf-token">
+    <input type="hidden" class="form-control" id="csrf-token" name="csrf-token" value="{{csrf_token}}">
     <p><input type = "text" name = "new_email"/></p>
     <p><input type = "submit" value = "Update"/></p>
 </form>
 
 <script>
-    document.getElementById("csrf-token").value = getCookie("csrf-token");
+    //document.getElementById("csrf-token").value = getCookie("csrf-token");
 </script>
 </body>
 </html>

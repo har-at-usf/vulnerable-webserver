@@ -5,10 +5,9 @@ from credentials import CredentialManagerAPI
 
 
 class CsrfTokens:
-    
     def validate(self, key: str, token: str) -> bool:
         pass
-    
+
     def update_token(self, key: str) -> str:
         pass
 
@@ -17,20 +16,21 @@ class CsrfTokens:
 
 
 class NoCsrfTokens(CsrfTokens):
-    
     def __init__(self):
-        pass 
-    
+        pass
+
     def validate(self, key: str, token: str) -> bool:
-        print("validate_token: Tokens are disabled Returning `True` unconditionally.")
+        print(
+            "validate_token: Tokens are disabled Returning `True` unconditionally."
+        )
         return True
-    
+
     def update_token(self, key: str) -> str:
         print("NOTE: update_token: Tokens are disabled.")
         return "no_token"
-        
+
     def get_token(self, key: str) -> str:
-        print("NOTE: get_token: Tokens are disabled.")    
+        print("NOTE: get_token: Tokens are disabled.")
         return "no_token"
 
 
@@ -49,17 +49,18 @@ class BasicCsrfTokens(CsrfTokens):
         return self.tokens[key]
 
     def get_token(self, key: str) -> str:
+        print("Tokens::get_token: ", self.tokens.get(key))
         return self.tokens.get(key)
 
 
 class Session:
-    
     def set_cookie(self, key: str) -> str:
-        pass 
-    
+        pass
+
     def get_cookie(self, cookie: str) -> str:
         pass
-            
+
+
 class BasicSession(Session):
 
     session: dict
@@ -72,14 +73,14 @@ class BasicSession(Session):
         new_cookie = self._get_nonce()
         self.session[new_cookie] = key
 
-        return new_cookie  
-    
+        return new_cookie
+
     def get_key(self, cookie: str) -> str:
-        return cookie in self.session.values() 
+        return cookie in self.session.values()
 
     def get_user(self, cookie: str) -> str:
         return self.session.get(cookie)
-    
+
     def validate(self, cookie: str) -> str:
         return cookie in self.session.keys()
 
@@ -94,8 +95,13 @@ class Authorization:
     credential_manager: CredentialManagerAPI
     session_manager: Session
     token_manager: CsrfTokens
-    
-    def __init__(self, session_manager: Session, token_manager: CsrfTokens, credential_manager: CredentialManagerAPI):
+
+    def __init__(
+        self,
+        session_manager: Session,
+        token_manager: CsrfTokens,
+        credential_manager: CredentialManagerAPI,
+    ):
         self.token_manager = token_manager
         self.session_manager = session_manager
         self.credential_manager = credential_manager
@@ -107,21 +113,28 @@ class Authorization:
 
     def update_email(self, cookie: str, token: str, new_email: str):
         print("Trying to update email with", cookie, token)
-        
+
         if self.token_manager.validate(cookie, token):
-            
+
             if self.session_manager.validate(cookie):
-                
+
                 print("Cookie and token validated. Updating email.")
-                self.credential_manager.update_email(self.session_manager.get_user(cookie), new_email)
+                self.credential_manager.update_email(
+                    self.session_manager.get_user(cookie), new_email
+                )
         # Uncomment to use per-request tokens.
         #
         #       self.token_manager.update_token(cookie)
-        #        
-        #return self.token_manager.get_token(cookie)
+        #
+        # return self.token_manager.get_token(cookie)
 
     def get_credential_info(self, cookie: str) -> str:
-        return self.credential_manager.get_credential_info(self.session_manager.get_user(cookie))
+        return self.credential_manager.get_credential_info(
+            self.session_manager.get_user(cookie)
+        )
+        
+    def get_token(self, cookie: str) -> str:
+        return self.token_manager.get_token(cookie)
 
     def validate_login(self, email: str, password: str) -> bool:
         print(email, password)
@@ -129,4 +142,3 @@ class Authorization:
 
     def is_logged_in(self, cookie: str) -> bool:
         return self.session_manager.get_user(cookie)
-

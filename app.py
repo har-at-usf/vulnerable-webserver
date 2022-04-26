@@ -9,7 +9,6 @@ from os import path
 from shutil import rmtree
 
 
-#SESSION_MANAGER: SessionManager
 SESSION_MANAGER: Authorization
 
 
@@ -41,6 +40,7 @@ def login_error(user=""):
             "Dear ", "Dear " + user
         )
 
+    # Applies encoding to all input (XSS-safe).
     else:
         error_page = render_template("invalid-login.html", username=user)
 
@@ -51,8 +51,7 @@ def login_error(user=""):
 def index():
     """Default webpage served."""
     resp = make_response(render_template("index.html"))
-    resp.set_cookie("Cookie", "initialcookienonce")
-    resp.set_cookie("csrf-token", "initialcsrfnonce")
+    resp.set_cookie("Cookie", "initialcookienologin")
     return resp
 
 
@@ -75,9 +74,8 @@ def login():
 
     resp = make_response(render_template("readcookie.html"))
     resp.set_cookie("Cookie", new_cookie)
-    resp.set_cookie("csrf-token", new_token)
 
-    return resp
+    return resp 
 
 
 @app.route("/dashboard")
@@ -86,6 +84,7 @@ def dashboard():
     the user's email/username and session cookie."""
 
     cookie = request.cookies.get("Cookie")
+    csrf_token = SESSION_MANAGER.get_token(cookie)
 
     # If the user is not logged in, return to the login screen.
     if not SESSION_MANAGER.is_logged_in(cookie):
@@ -96,6 +95,7 @@ def dashboard():
             "dashboard.html",
             username=SESSION_MANAGER.get_credential_info(cookie),
             cookie=cookie,
+            csrf_token=csrf_token
         )
     )
 
@@ -105,7 +105,6 @@ def change_email():
     """Require a token in order to change the email address."""
 
     cookie = request.cookies.get("Cookie")
-    #csrf_token = request.form["csrf-token"]
     csrf_token = request.form.get("csrf-token")
 
     SESSION_MANAGER.update_email(cookie, csrf_token, request.form["new_email"])
