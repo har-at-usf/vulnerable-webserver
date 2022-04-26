@@ -1,5 +1,7 @@
-from session import SessionManager
-from tokens import TokenizedSessionManager
+#from session import SessionManager
+#from tokens import TokenizedSessionManager
+from authorization import Authorization, BasicSession, BasicCsrfTokens, NoCsrfTokens
+from credentials import CredentialManagerAPI
 from cli import get_args
 from flask import Flask, render_template, request, make_response
 from traceback import print_exc
@@ -7,7 +9,8 @@ from os import path
 from shutil import rmtree
 
 
-SESSION_MANAGER: SessionManager
+#SESSION_MANAGER: SessionManager
+SESSION_MANAGER: Authorization
 
 
 app = Flask(__name__)
@@ -68,8 +71,7 @@ def login():
     if not cookie_key:
         return login_error(user)
 
-    new_cookie = SESSION_MANAGER.set_cookie(cookie_key)
-    new_token = SESSION_MANAGER.update_token(new_cookie)
+    new_cookie, new_token = SESSION_MANAGER.create_session(cookie_key)
 
     resp = make_response(render_template("readcookie.html"))
     resp.set_cookie("Cookie", new_cookie)
@@ -103,7 +105,8 @@ def change_email():
     """Require a token in order to change the email address."""
 
     cookie = request.cookies.get("Cookie")
-    csrf_token = request.form["csrf-token"]
+    #csrf_token = request.form["csrf-token"]
+    csrf_token = request.form.get("csrf-token")
 
     SESSION_MANAGER.update_email(cookie, csrf_token, request.form["new_email"])
 
@@ -126,11 +129,15 @@ if __name__ == "__main__":
     # Set to `False` unless the flag is explicitly specified.
     DEMO_SETTINGS = {
         "unsafe_form_data": cli_args.xss,
-        "use_tokens": cli_args.csrf,
+        "disable_csrf_tokens": cli_args.csrf,
         "hardcode_admin_hash": cli_args.hardcodehash,
     }
 
     # TODO: In the future, see notes for composition/interfacing in tokens.py...
-    SESSION_MANAGER = TokenizedSessionManager()
+    SESSION_MANAGER = Authorization(
+        BasicSession(),
+        NoCsrfTokens() if DEMO_SETTINGS["disable_csrf_tokens"] else BasicCsrfTokens(),
+        CredentialManagerAPI
+    )
 
     app.run()
