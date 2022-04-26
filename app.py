@@ -1,20 +1,47 @@
+from session import SessionManager
 from tokens import TokenizedSessionManager
+from cli import get_args
 from flask import Flask, render_template, request, make_response
 from traceback import print_exc
 from os import path
 from shutil import rmtree
 
 
-SESSION_MANAGER = TokenizedSessionManager()
+SESSION_MANAGER: SessionManager
+
 
 app = Flask(__name__)
 
 
-# Uncomment to catch all errors (debug).
+# Lord forgive me for my global variables... After they are set from the CLI
+# args, DO NOT change their values.
+DEMO_SETTINGS: dict
+
+
+# Uncomment to catch all errors (debug). You can return a generic error page.
 # @app.errorhandler(Exception)
 # def bad_login(exception):
 #    print(print_exc(), str(exception))
-#    return "<h1>An error has occurred</h1><a href='/'>Return to home</a>"
+
+
+@app.route("/loginerror")
+def login_error(user=""):
+    """Return an 'invalid login' webpage to the user (for example, bad
+    username or password). If the global `unsanitized_forms` option is
+    `True` (default), the returned webpage is vulnerable to XSS. Otherwise,
+    it applies HTML encoding to the username, and returns a webpage that is
+    safe to render on a browser."""
+
+    # String concatenation (vulnerable to script injection).
+    if DEMO_SETTINGS["unsafe_form_data"]:
+        error_page = render_template("invalid-login.html").replace(
+            "Dear ", "Dear " + user
+        )
+
+    else:
+        error_page = render_template("invalid-login.html", username=user)
+
+    return make_response(error_page)
 
 
 @app.route("/")
@@ -31,15 +58,15 @@ def login():
     """Called when the user sets a cookie for the first time."""
 
     if not request.method == "POST":
-        raise Exception("Invalid request method.")
+        return index()
 
-    user_email = request.form["email"]
+    user = request.form["email"]
     user_password = request.form["password"]
 
-    cookie_key = SESSION_MANAGER.validate_login(user_email, user_password)
+    cookie_key = SESSION_MANAGER.validate_login(user, user_password)
 
     if not cookie_key:
-        raise Exception("Invalid login credentials.")
+        return login_error(user)
 
     new_cookie = SESSION_MANAGER.set_cookie(cookie_key)
     new_token = SESSION_MANAGER.update_token(new_cookie)
@@ -53,18 +80,21 @@ def login():
 
 @app.route("/dashboard")
 def dashboard():
-    """Called when a user wants to check their cookies."""
+    """Present a mock dashboard for user actions. Current version will display
+    the user's email/username and session cookie."""
 
     cookie = request.cookies.get("Cookie")
 
+    # If the user is not logged in, return to the login screen.
     if not SESSION_MANAGER.is_logged_in(cookie):
-        raise Exception("User is not logged in.")
+        return login()
 
     return make_response(
-        "<h1>Welcome</h1>"
-        + SESSION_MANAGER.get_credential_info(cookie)
-        + "</pre></p>"
-        + render_template("dashboard.html")
+        render_template(
+            "dashboard.html",
+            username=SESSION_MANAGER.get_credential_info(cookie),
+            cookie=cookie,
+        )
     )
 
 
@@ -84,10 +114,23 @@ if __name__ == "__main__":
     """TODO: Separate this logic somewhere else..."""
 
     delete_these = ["__pycache__"]
-    
+
     for filename in delete_these:
-    
+
         if path.exists(filename):
             rmtree(filename)
+
+    # Settings are based on cli arguments.
+    cli_args = get_args()
+
+    # Set to `False` unless the flag is explicitly specified.
+    DEMO_SETTINGS = {
+        "unsafe_form_data": cli_args.xss,
+        "use_tokens": cli_args.csrf,
+        "hardcode_admin_hash": cli_args.hardcodehash,
+    }
+
+    # TODO: In the future, see notes for composition/interfacing in tokens.py...
+    SESSION_MANAGER = TokenizedSessionManager()
 
     app.run()

@@ -26,7 +26,7 @@ class CredentialManagerAPI:
 
     valid_users = {
         1: Credential("admin", "admin@mail.tld", "password123"),
-        2: Credential("sysadmin", "sysadmin", "password1")    
+        2: Credential("sysadmin", "sysadmin", "password1"),
     }
 
     @classmethod

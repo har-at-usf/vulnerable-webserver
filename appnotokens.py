@@ -65,6 +65,8 @@ def dashboard():
 
 @app.route("/update-email", methods=["POST"])
 def change_email():
+    
+    print(request.cookies.get("Cookie"))
 
     cookie = request.cookies.get("Cookie")
 

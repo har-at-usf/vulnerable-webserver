@@ -92,10 +92,14 @@
 
         <!-- 
             Remove the  `onsubmit` definition if you don't need to prove an
-            issue that's related to hardcoded password hashing.
+            issue that's related to hardcoded password hashing. It should be
+            another `form` attribute.
+
+            TODO: Allow some JS do add/remove this from the launcher...
+
+                onsubmit="event.preventDefault(); return validateLogin();" 
         -->
         <form 
-            onsubmit="event.preventDefault(); return validateLogin();" 
             id="login-form"
             action="/login" 
             method="POST"

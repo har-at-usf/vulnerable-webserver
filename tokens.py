@@ -1,3 +1,17 @@
+"""
+TODO: Use the strategy pattern and branch the token manager into:
+
+- TokenManager: interface
+
+- BasicTokenManager: implements TokenManager
+
+- NoTokenManager: implements TokenManager
+
+- Session: Composes any TokenManager
+
+In that way, you can set the Session's TokenManager as a constructor argument,
+using a CLI argument. This could allow the use of a JWT.
+"""
 from secrets import token_urlsafe
 from session import SessionManager
 
